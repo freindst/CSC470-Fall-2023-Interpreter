@@ -1,5 +1,4 @@
 #lang racket
-(require "Parser.rkt")
 (define variable_env '(((a 1)(b 2)(c 33)(d "string")(e a))))
 (define resolve_scope (lambda (variable_name scope)
                   (cond
@@ -46,7 +45,6 @@
   )
   )
 
-
 ;(parser 'a) -> (var-exp a)
 ;(parser '(function (x) x)) -> (func-exp ((var-exp x)) (var-exp x))
 ;(parser '(call (function (x) x) a)) -> (app-exp (func-exp ((var-exp x)) (var-exp x)) (var-exp a))
@@ -75,17 +73,15 @@
 
                  )
   )
+
 (parser '(call (function (x) x) a))
 
 ;(processor (var-exp a)) -> (resolve a variable_env) -> 1
-;(processor (app-exp (func-exp ((var-exp x)) (var-exp x)) (var-exp a))
 (define processor (lambda (parse variable_env)
                     (cond
                       ((null? parse) (print "Processing failed. Bad parsed syntax."))
                       ((eq? (car parse) 'var-exp) (resolve (cadr parse)))
-                      ((eq? (car parse) 'app-exp)
-                       (car (cadr (cadr parse)))
-                       )
+                      ((eq? (car parse) 'app-exp) (print "more to do"))
                       (else "Processing failed. Unknown issue.")
                       )
                     )
@@ -99,4 +95,7 @@
   )
 
 
-(executor '(call (function (x) x) a))
+;(executor '(call (function (x) z) a))
+(append_var 'hunter 20)
+(print variable_env)
+(resolve 'hunter)

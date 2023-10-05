@@ -1,0 +1,1 @@
+("8.10" tarm64osx ("1b80258a4abbfc866c5261c883afc3bb684d10a4" . "41be6f047b2e1e623af304f32929bf1004aa31bd") #"/Users/yimingliao/Desktop/untitled folder/CSC470 Fall 2023 Interpreter/Utility.rkt" (collects #"drracket" #"private" #"drracket-errortrace-key.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt"))
