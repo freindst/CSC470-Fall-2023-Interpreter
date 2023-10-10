@@ -40,4 +40,14 @@
     )
   )
 
+(define is_in_list
+  (lambda (lst item)
+    (cond
+      ((null? lst) #f)
+      ((eq? (car lst) item) #t)
+      (else (is_in_list (cdr lst) item))
+      )
+    )
+  )
+
 (provide (all-defined-out))

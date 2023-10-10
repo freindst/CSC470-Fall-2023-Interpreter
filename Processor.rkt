@@ -38,6 +38,43 @@
     )
   )
 
+;(bool-exp == (var-exp a) (num-exp 1))
+(define process_bool_exp
+  (lambda
+   (parsedCode env)
+   (cond
+     ((eq? '> (cadr parsedCode))
+      (> (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '< (cadr parsedCode))
+      (< (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '>= (cadr parsedCode))
+      (>= (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '<= (cadr parsedCode))
+      (<= (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '== (cadr parsedCode))
+      (eq? (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '&& (cadr parsedCode))
+      (and (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '|| (cadr parsedCode))
+      (or (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '! (cadr parsedCode))
+      (not (processor (caddr parsedCode) env)))
+     ((eq? '!= (cadr parsedCode))
+      (not (eq? (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env))))
+     (else (println "Error: illegal boolean expression"))
+      )
+   )
+  )
+
+(define process_ask_exp
+  (lambda
+   (parsedCode env)
+   (if
+    (processor (cadr parsedCode) env)
+    (processor (caddr parsedCode) env)
+    (processor (cadddr parsedCode) env))
+   )
+  )
 
 (define processor
   (lambda
@@ -55,6 +92,11 @@
       ((eq? 'num-exp (car parsedCode))
        (process_num_exp parsedCode env))
       ;when parsed code is a boolean expression
+      ((eq? 'bool-exp (car parsedCode))
+       (process_bool_exp parsedCode env))
+      ;when parsed code is a ask expression
+      ((eq? 'ask-exp (car parsedCode))
+       (process_ask_exp parsedCode env))
       ;....
       ;otherwise
       (else #f)
