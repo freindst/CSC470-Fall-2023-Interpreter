@@ -76,6 +76,28 @@
    )
   )
 
+;process math ('+ '- '* '/ '// '%)
+(define process_math_exp
+  (lambda
+   (parsedCode env)
+   (cond
+     ((eq? '+ (cadr parsedCode))
+      (+ (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '- (cadr parsedCode))
+      (- (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '* (cadr parsedCode))
+      (* (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '/ (cadr parsedCode));integer division 5/2 = 2
+      (quotient (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '// (cadr parsedCode));float division, give you mix number 5/2 = 2 and 1/2
+      (/ (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '% (cadr parsedCode))
+      (modulo (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     (else (println "Error: illegal math expression"))
+      )
+   )
+  )
+
 (define processor
   (lambda
       (parsedCode env)
@@ -97,6 +119,9 @@
       ;when parsed code is a ask expression
       ((eq? 'ask-exp (car parsedCode))
        (process_ask_exp parsedCode env))
+      ;when parsed code is a math expression
+      ((eq? 'math-exp (car parsedCode))
+       (process_math_exp parsedCode env))
       ;....
       ;otherwise
       (else #f)

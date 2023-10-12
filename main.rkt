@@ -12,11 +12,13 @@
   )
 
 ;(resolve_env 'b var_env)
-;(call (function (x) x) 1)
+;(call (function (x) (+ x a)) 1)
 ;(parsed '(== a b)) -> (bool-exp == a b)
 ;(processor (bool-exp == 2 1)) -> #f
 (define parsed
-  (parser '(+ 2 a))
+  (parser '(call (function (x) (+ x a)) 1))
   )
-parsed
-;(processor parsed var_env)
+;parsed
+(processor parsed var_env)
+
+

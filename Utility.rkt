@@ -7,7 +7,7 @@
     (cond
       ((null? env) (print "Error: Variable not found."))
       ((eq? #f (resolve_scope varname (car env)))
-       (resolve_scope varname (cdr env)))
+        (resolve_env varname (cdr env)))
       (else (resolve_scope varname (car env)))
      )
     )
