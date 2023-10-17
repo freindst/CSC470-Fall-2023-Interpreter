@@ -64,3 +64,11 @@ compiled/
 # End of https://www.toptal.com/developers/gitignore/api/racket,scheme,macos
 
 *.rkt~
+compiled/drracket/errortrace/parser_rkt.dep
+compiled/drracket/errortrace/Parser_rkt.zo
+compiled/drracket/errortrace/Processor_rkt.dep
+compiled/drracket/errortrace/Processor_rkt.zo
+compiled/drracket/errortrace/Utility_rkt.dep
+compiled/drracket/errortrace/Utility_rkt.zo
+main.rkt~
+Parser.rkt~
