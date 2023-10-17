@@ -40,7 +40,7 @@
         (eq? 'function (car statement))
         (eq? (length statement) 3)
         )
-       (list 'func-exp (list (parser (car (cadr statement)))) (parser (caddr statement)))
+       (list 'func-exp (list (parser (cadr statement))) (parser (caddr statement)))
        )
       ;this is a function expression
       ;(function (arg) body)
@@ -49,7 +49,13 @@
         (eq? 'call (car statement))
         (eq? (length statement) 3)
         )
-       (list 'app-exp (parser (cadr statement)) (parser (caddr statement)))
+       ;(call (function (x y) (* x y)) (5 c))
+       ;check the parameter number matches with the values passed in
+       (if
+        (eq? (length (cadr (cadr statement))) (length (caddr statement)))
+        (list 'app-exp (parser (cadr statement)) (parser (caddr statement)))
+        (print "Error: argument list mismatches.")
+       )
        );this is an app epxression
       ((and
         (list? statement)
@@ -62,6 +68,11 @@
          (parser (cadddr statement))
          )
         );this is an ask expression
+      ((list? statement) ;(x 1 z ...) -> (list-exp (var-exp x) (num-exp 1) (var-exp z) ...)
+       (cons 'list-exp (map (lambda(item)
+              (parser item)
+              ) statement))
+       );this is a list expression
       (else
        (print "Parsing failed. Unknown statement."))
       )

@@ -19,7 +19,10 @@
   )
     
 
-;(processor (app-exp (func-exp ((var-exp x)) (var-exp x)) (var-exp a)))
+;(processor (app-exp (func-exp (list-exp (var-exp x) (var-exp y)) (var-exp x))
+;(list-exp (var-exp a) (num-exp 5)))
+;(list-exp (var-exp x) (var-exp y)) -> (x y)
+;(list-exp (var-exp a) (num-exp 5)) -> (process (var-exp a)) (process (num-exp 5)
 ;function func(x){...}; func(1)
 (define process_app_exp
   (lambda
@@ -27,9 +30,10 @@
     (let
         (
          (local_env
-          (push_var_to_env
-           (cadr (car (cadr (cadr parsedCode))))
-           (processor (caddr parsedCode) env)
+          (push_vars_to_env
+           (map (lambda (arg) (cadr arg)) (cdr (car (cadr (cadr parsedCode)))))
+           (map (lambda (val-exp) (processor val-exp env))
+                (cdr (caddr parsedCode)))
            env)
           )
          )
