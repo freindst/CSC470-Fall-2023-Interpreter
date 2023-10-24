@@ -11,7 +11,7 @@
    )
   )
 
-(define parsed '(call (function (x y) (* x y)) (5 c)))
+(define parsed '(call (function (x) (let ((d 10) (f 20)) (+ d (+ f x)))) (5)))
 (parser parsed)
 ;parsed-> (app-exp (func-exp ((var-exp x) (var-exp y)) (math-exp * (var-exp x) (var-exp y)))
 ;((num-exp 5) (var-exp c)))
@@ -19,5 +19,5 @@
 ;  (parser '(call (function(x)(ask (== a 1) (+ x 1) (- x 1))) (2)))
 ;  )
 ;parsed
-(processor (parser parsed) var_env)
+;(processor (parser parsed) var_env)
 

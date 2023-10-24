@@ -59,6 +59,17 @@
        );this is an app epxression
       ((and
         (list? statement)
+        (eq? 'let (car statement))
+        (eq? (length statement) 3))
+       ;(let ((a 3) (b 4)) (+ a b))
+       ;(let-exp (list-exp ((var-exp a) (num-exp 3)) ((var-exp b) (num-exp 4)) (math-exp + (var-exp a) (var-exp b))
+       (list 'let-exp
+             (cons 'list-exp (map (lambda (pair) (map (lambda (item) (parser item)) pair)) (cadr statement)))
+             (parser (caddr statement)))
+       )
+      ;this is let expression to add new local variables
+      ((and
+        (list? statement)
         (eq? 'ask (car statement))
         (eq? (length statement) 4))
         (list
