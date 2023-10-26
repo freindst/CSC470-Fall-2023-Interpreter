@@ -19,7 +19,10 @@
   )
     
 
-;(processor (app-exp (func-exp ((var-exp x)) (var-exp x)) (var-exp a)))
+;(processor (app-exp (func-exp (list-exp (var-exp x) (var-exp y)) (var-exp x))
+;(list-exp (var-exp a) (num-exp 5)))
+;(list-exp (var-exp x) (var-exp y)) -> (x y)
+;(list-exp (var-exp a) (num-exp 5)) -> (process (var-exp a)) (process (num-exp 5)
 ;function func(x){...}; func(1)
 (define process_app_exp
   (lambda
@@ -27,9 +30,10 @@
     (let
         (
          (local_env
-          (push_var_to_env
-           (cadr (car (cadr (cadr parsedCode))))
-           (processor (caddr parsedCode) env)
+          (push_vars_to_env
+           (map (lambda (arg) (cadr arg)) (cdr (car (cadr (cadr parsedCode)))))
+           (map (lambda (val-exp) (processor val-exp env))
+                (cdr (caddr parsedCode)))
            env)
           )
          )
@@ -76,6 +80,28 @@
    )
   )
 
+;process math ('+ '- '* '/ '// '%)
+(define process_math_exp
+  (lambda
+   (parsedCode env)
+   (cond
+     ((eq? '+ (cadr parsedCode))
+      (+ (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '- (cadr parsedCode))
+      (- (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '* (cadr parsedCode))
+      (* (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '/ (cadr parsedCode));integer division 5/2 = 2
+      (quotient (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '// (cadr parsedCode));float division, give you mix number 5/2 = 2 and 1/2
+      (/ (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     ((eq? '% (cadr parsedCode))
+      (modulo (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
+     (else (println "Error: illegal math expression"))
+      )
+   )
+  )
+
 (define processor
   (lambda
       (parsedCode env)
@@ -97,6 +123,9 @@
       ;when parsed code is a ask expression
       ((eq? 'ask-exp (car parsedCode))
        (process_ask_exp parsedCode env))
+      ;when parsed code is a math expression
+      ((eq? 'math-exp (car parsedCode))
+       (process_math_exp parsedCode env))
       ;....
       ;otherwise
       (else #f)

@@ -102,6 +102,24 @@
    )
   )
 
+;(let-exp
+;(list-exp ((var-exp d) (num-exp 10)) ((var-exp f) (num-exp 20)))
+;(math-exp + (var-exp d) (math-exp + (var-exp f) (var-exp x))
+(define process_let_exp
+  (lambda (parsedCode env)
+    (let*
+        ((varname_value_list;varname_value_list = ((d 10) (e 20))
+          (map (lambda (pair)
+                 (list (cadr (car pair)) (processor (cadr pair) env)))
+               (cdr (cadr parsedCode))))
+         ;((d 10) (e 20)) + (((x 5)) ((a 1) (b 2) (c 3)))
+         ;(((d 10) (e 20) (x 5)) ((a 1) (b 2) (c 3)))
+         (let_local_env (cons (append varname_value_list (car env)) (cdr env))))
+      (processor (caddr parsedCode) let_local_env)
+     )
+    )
+  )
+
 (define processor
   (lambda
       (parsedCode env)
@@ -126,6 +144,9 @@
       ;when parsed code is a math expression
       ((eq? 'math-exp (car parsedCode))
        (process_math_exp parsedCode env))
+      ;when parsed code is a let expression
+      ((eq? 'let-exp (car parsedCode))
+       (process_let_exp parsedCode env))
       ;....
       ;otherwise
       (else #f)

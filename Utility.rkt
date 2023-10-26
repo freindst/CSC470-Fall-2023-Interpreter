@@ -47,15 +47,6 @@
   )
   )
 
-;add varable and value paris to the current scope
-(define add_vars_to_top_scope
-  (lambda (list_var list_val env)
-    (cons
-     (append (pair_helper list_var list_val) (car env))
-     (cdr env)
-     )
-    )
-  )
 
 (define pair_helper
   (lambda (list_var list_val)

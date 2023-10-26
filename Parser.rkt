@@ -62,9 +62,16 @@
         (eq? 'let (car statement))
         (eq? (length statement) 3))
        ;(let ((a 3) (b 4)) (+ a b))
+       ;how to parse ((a 3) (b 4)) to (let-exp ((var-exp a) (num-exp 3)) ((var-exp b) (num-exp 4))
        ;(let-exp (list-exp ((var-exp a) (num-exp 3)) ((var-exp b) (num-exp 4)) (math-exp + (var-exp a) (var-exp b))
        (list 'let-exp
-             (cons 'list-exp (map (lambda (pair) (map (lambda (item) (parser item)) pair)) (cadr statement)))
+             (cons
+              'list-exp
+              (map
+               (lambda (pair)
+                 (map (lambda (item) (parser item)) pair))
+               (cadr statement))
+              )
              (parser (caddr statement)))
        )
       ;this is let expression to add new local variables
