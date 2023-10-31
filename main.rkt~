@@ -11,13 +11,9 @@
    )
   )
 
-(define parsed '(call (function (x y) (* x y)) (5 c)))
-(parser parsed)
-;parsed-> (app-exp (func-exp ((var-exp x) (var-exp y)) (math-exp * (var-exp x) (var-exp y)))
-;((num-exp 5) (var-exp c)))
-;(define parsed
-;  (parser '(call (function(x)(ask (== a 1) (+ x 1) (- x 1))) (2)))
-;  )
-;parsed
-(processor (parser parsed) var_env)
+(define code '(while (<  a 10) (+ a 1))); a very simple expression: (while-exp (boolean-exp < a 10) (math-exp + a 1))
 
+;the challenge is that we need to look fo a in the environment, and update a in its environment
+(define parsed (parser code))
+parsed
+;(processor parsed var_env)

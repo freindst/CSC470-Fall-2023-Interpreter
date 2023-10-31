@@ -54,7 +54,7 @@
        (if
         (eq? (length (cadr (cadr statement))) (length (caddr statement)))
         (list 'app-exp (parser (cadr statement)) (parser (caddr statement)))
-        (print "Error: argument list mismatches.")
+        (error-output "argument list mismatches.")
        )
        );this is an app epxression
       ((and
@@ -86,13 +86,19 @@
          (parser (cadddr statement))
          )
         );this is an ask expression
+      ((and
+        (pair? statement)
+        (eq? 'out (car statement))
+        (eq? (length statement) 2)
+        )
+       (list 'output-exp (parser (cadr statement))));this is output expression
       ((list? statement) ;(x 1 z ...) -> (list-exp (var-exp x) (num-exp 1) (var-exp z) ...)
        (cons 'list-exp (map (lambda(item)
               (parser item)
               ) statement))
        );this is a list expression
       (else
-       (print "Parsing failed. Unknown statement."))
+       (error-output "Parsing failed. Unknown statement."))
       )
     )
   )

@@ -47,6 +47,18 @@
   )
   )
 
+;truncate environment scopes until only global scope left
+;not perfect when env is empty or env is not an environment
+(define trim_to_global_scope
+  (lambda (env)
+    (cond
+      ((not (pair? env)) (print "illegal environment passed into the trim_to_global_scope argument list"))
+      ((eq? 1 (length env)) env)
+      (else (trim_to_global_scope (cdr env)))
+      )
+    )
+  )
+
 (define pair_helper
   (lambda (list_var list_val)
     (if (null? list_var)

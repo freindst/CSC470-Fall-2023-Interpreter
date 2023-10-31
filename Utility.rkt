@@ -5,7 +5,7 @@
   (lambda
       (varname env)
     (cond
-      ((null? env) (print "Error: Variable not found."))
+      ((null? env) (error-output "Variable not found."))
       ((eq? #f (resolve_scope varname (car env)))
         (resolve_env varname (cdr env)))
       (else (resolve_scope varname (car env)))
@@ -47,6 +47,17 @@
   )
   )
 
+;truncate environment scopes until only global scope left
+;not perfect when env is empty or env is not an environment
+(define trim_to_global_scope
+  (lambda (env)
+    (cond
+      ((not (pair? env)) (error-output "Illegal environment passed into the trim_to_global_scope argument list"))
+      ((eq? 1 (length env)) env)
+      (else (trim_to_global_scope (cdr env)))
+      )
+    )
+  )
 
 (define pair_helper
   (lambda (list_var list_val)
@@ -65,6 +76,13 @@
       ((eq? (car lst) item) #t)
       (else (is_in_list (cdr lst) item))
       )
+    )
+  )
+
+
+(define error-output
+  (lambda (output)
+    (displayln (string-append "***Error***: " output))
     )
   )
 

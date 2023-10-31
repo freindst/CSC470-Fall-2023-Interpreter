@@ -11,7 +11,9 @@
    )
   )
 
-(define code '(call (function (a) (call (function (r) a ) (a))) (5)))
+(define code '(while (<  a 10) (+ a 1))); a very simple expression: (while-exp (boolean-exp < a 10) (math-exp + a 1))
+
+;the challenge is that we need to look fo a in the environment, and update a in its environment
 (define parsed (parser code))
-(processor parsed var_env)
-;correct the answer from 5 to 1
+parsed
+;(processor parsed var_env)
