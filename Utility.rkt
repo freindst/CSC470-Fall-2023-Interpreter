@@ -86,4 +86,15 @@
     )
   )
 
+(define pick_first_non_void_from_list
+  (lambda (lst)
+    (cond
+      ((not (pair? lst)) (error-output "received invalid parameter for a list"))
+      ((and (pair? lst) (eq? (length lst) 1) (void? (car lst))) (displayln ""))
+      ((void? (car lst)) (pick_first_non_void_from_list (cdr lst)))
+      (else (car lst))
+     )
+    )
+  )
+
 (provide (all-defined-out))

@@ -152,7 +152,11 @@
        (process_let_exp parsedCode env))
       ;when parsed code is an output expression
       ((eq? 'output-exp (car parsedCode))
-       (display (string-append "***output***: "(number->string (processor (cadr parsedCode) env)))))
+       (displayln (string-append "***output***: "(number->string (processor (cadr parsedCode) env)))))
+      ;when parsed code is a block expression
+      ((eq? 'block-exp (car parsedCode))
+       (pick_first_non_void_from_list
+        (map (lambda (code) (processor code env)) (cdr parsedCode))))
       ;....
       ;otherwise
       (else (error-output "Processor failed to produce result."))

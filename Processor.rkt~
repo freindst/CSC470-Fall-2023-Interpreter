@@ -27,14 +27,17 @@
 (define process_app_exp
   (lambda
       (parsedCode env)
-    (let
+    (let*
         (
+         ;structure of env ((.pairs.)(.pairs.)...(.pairs..)(global-variable-scope))
+         (global_env (trim_to_global_scope env));this is the environment only has the global scope;
+;local_env only has the variable-value paris of the argument list and the global variable scope
          (local_env
           (push_vars_to_env
            (map (lambda (arg) (cadr arg)) (cdr (car (cadr (cadr parsedCode)))))
            (map (lambda (val-exp) (processor val-exp env))
                 (cdr (caddr parsedCode)))
-           env)
+           global_env)
           )
          )
       (processor (caddr (cadr parsedCode)) local_env)
@@ -65,7 +68,7 @@
       (not (processor (caddr parsedCode) env)))
      ((eq? '!= (cadr parsedCode))
       (not (eq? (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env))))
-     (else (println "Error: illegal boolean expression"))
+     (else (error-output "Illegal boolean expression"))
       )
    )
   )
@@ -97,9 +100,27 @@
       (/ (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
      ((eq? '% (cadr parsedCode))
       (modulo (processor (caddr parsedCode) env) (processor (cadddr parsedCode) env)))
-     (else (println "Error: illegal math expression"))
+     (else (error-output "Illegal math expression"))
       )
    )
+  )
+
+;(let-exp
+;(list-exp ((var-exp d) (num-exp 10)) ((var-exp f) (num-exp 20)))
+;(math-exp + (var-exp d) (math-exp + (var-exp f) (var-exp x))
+(define process_let_exp
+  (lambda (parsedCode env)
+    (let*
+        ((varname_value_list;varname_value_list = ((d 10) (e 20))
+          (map (lambda (pair)
+                 (list (cadr (car pair)) (processor (cadr pair) env)))
+               (cdr (cadr parsedCode))))
+         ;((d 10) (e 20)) + (((x 5)) ((a 1) (b 2) (c 3)))
+         ;(((d 10) (e 20) (x 5)) ((a 1) (b 2) (c 3)))
+         (let_local_env (cons (append varname_value_list (car env)) (cdr env))))
+      (processor (caddr parsedCode) let_local_env)
+     )
+    )
   )
 
 (define processor
@@ -107,7 +128,7 @@
       (parsedCode env)
     (cond
       ;when parsed Code is empty
-      ((null? parsedCode) (displayln "Error: Processor receives an illegal parsed code"))
+      ((null? parsedCode) (error-output "Processor receives an illegal parsed code"))
       ;when parsed code is a var expression
       ((eq? 'var-exp (car parsedCode))
        (process_var_exp parsedCode env))
@@ -126,11 +147,21 @@
       ;when parsed code is a math expression
       ((eq? 'math-exp (car parsedCode))
        (process_math_exp parsedCode env))
+      ;when parsed code is a let expression
+      ((eq? 'let-exp (car parsedCode))
+       (process_let_exp parsedCode env))
+      ;when parsed code is an output expression
+      ((eq? 'output-exp (car parsedCode))
+       (displayln (string-append "***output***: "(number->string (processor (cadr parsedCode) env)))))
+      ;when parsed code is a block expression
+      ((eq? 'block-exp (car parsedCode))
+       (map (lambda (code) (processor code env)) (cdr parsedCode)))
       ;....
       ;otherwise
-      (else #f)
+      (else (error-output "Processor failed to produce result."))
       )
     )
   )
+
 
 (provide (all-defined-out))

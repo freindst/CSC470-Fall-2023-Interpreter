@@ -92,6 +92,20 @@
         (eq? (length statement) 2)
         )
        (list 'output-exp (parser (cadr statement))));this is output expression
+      ((and
+        (pair? statement)
+        (eq? 'when (car statement))
+        (eq? (length statement) 3))
+       (cons
+        'when-exp
+        (map (lambda (item) (parser item)) (cdr statement)))
+       );this is our when expression (while)
+      ((and
+        (pair? statement)
+        (eq? 'block (car statement))
+        (> (length statement) 1))
+       (cons 'block-exp
+             (map (lambda(item)(parser item)) (cdr statement))));this is a block expression contains multiple statements in the list
       ((list? statement) ;(x 1 z ...) -> (list-exp (var-exp x) (num-exp 1) (var-exp z) ...)
        (cons 'list-exp (map (lambda(item)
               (parser item)
