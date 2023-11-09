@@ -76,6 +76,17 @@
        )
       ;this is let expression to add new local variables
       ((and
+        (pair? statement)
+        (eq? 'assign (car statement))
+        (eq? (length statement) 3))
+       (list
+        'assign-exp
+        (list
+         (parser (cadr statement))
+         (parser (caddr statement)))
+        )
+       );this is assign expression to update/create one variable
+      ((and
         (list? statement)
         (eq? 'ask (car statement))
         (eq? (length statement) 4))
