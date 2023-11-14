@@ -16,4 +16,5 @@
 ;the challenge is that we need to look fo a in the environment, and update a in its environment
 (define parsed (parser code))
 parsed
-;(processor parsed var_env)
+(processor parsed var_env)
+

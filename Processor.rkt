@@ -6,7 +6,7 @@
 (define process_var_exp
   (lambda
       (parsedCode env)
-    (resolve_env (cadr parsedCode) env)
+     (resolve_env (cadr parsedCode) env)
     )
   )
 
@@ -137,34 +137,43 @@
     )
   )
 
+;parsedCode =(when-exp (bool-exp < a 5)(block-exp (output-exp (var-exp a)) (let-exp ...)
 (define process_when_exp
   (lambda (parsedCode env)
-    (
-     (let
-         ((condition (processor (cadr parsedCode) env))
-          (true_body_exp (append (cdr (caddr parsedCode)) (list parsedCode)))
-       )
-     (if condition
-         ;(list-exp (assign-exp ((var-exp a) (math-exp + (var-exp a) (num-exp 1)))) (output-exp (var-exp a))))
-         ;append the parsedCode to the parsedCode
-         ;execute every code
-         (processor_when_exp_body true_body_exp env)
-         ;otherwise stop
-         (println "when-loop stop here")
-     )
-    )
+    (let
+        ((condition (processor (cadr parsedCode) env))
+         (true_body_exp (append (cdr (caddr parsedCode)) (list parsedCode))))
+      (erase_void (if condition
+          ;(list-exp (assign-exp ((var-exp a) (math-exp + (var-exp a) (num-exp 1)))) (output-exp (var-exp a))))
+          ;append the parsedCode to the parsedCode
+          ;execute every code
+          (process_when_exp_body true_body_exp env)
+          ;otherwise stop
+          (println "when-loop stop here")
+       ))
+      )
   )
-    )
-
   )
 
-(define processor_when_exp_body
+(define process_when_exp_body
   (lambda (body env)
     (cond
       ((null? body) '())
       ((eq? 'assign-exp (car (car body)))
-       (processor_when_exp_body (cdr body) (processor_assign_exp (car body) env)))
-      (else (cons (procesor (car body) env) (processor_when_exp_body (cdr body) env)))
+       (process_when_exp_body (cdr body) (process_assign_exp (car body) env)))
+      (else (cons (processor (car body) env) (process_when_exp_body (cdr body) env)))
+      )
+    )
+  )
+
+;(#<void> (#<void> (#<void> (#<void> #<void>))))
+(define erase_void
+  (lambda (lst)
+    (cond
+      ((null? lst) '())
+      ((void? lst) '())
+      ((void? (car lst)) (erase_void (cdr lst)))
+      (else (append (car lst) (erase_void (cdr lst))))
       )
     )
   )
@@ -221,7 +230,7 @@
     (cond
       ((null? env) '())
       ((is_var_in_scope varname (car env))
-       (update_variable_in_scope varname value (car env)))
+       (cons (update_variable_in_scope varname value (car env)) (cdr env)))
       (else (cons (car env) (update_varaible_in_env varname value (cdr env))))
      )))
 
@@ -267,7 +276,7 @@
        (process_assign_exp parsedCode env))
       ;when parsed code is a when expression
       ((eq? 'when-exp (car parsedCode))
-       (println "todo"))
+       (process_when_exp parsedCode env))
       ;when parsed code is an output expression
       ((eq? 'output-exp (car parsedCode))
        (displayln (string-append "***output***: "(number->string (processor (cadr parsedCode) env)))))
