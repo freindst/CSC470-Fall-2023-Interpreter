@@ -11,10 +11,11 @@
    )
   )
 
-(define code '(when (< a 5) ((assign a (+ a 1)) (out a)))) ; we would like to repeat print a for 4 times
-;parse->(when-exp (bool-exp < a 5)(block-exp (output-exp (var-exp a)) (let-exp ...)
-;the challenge is that we need to look fo a in the environment, and update a in its environment
+(define code '(each (a 0) (< 5 a) (a (+ a 1)) ((out a)))) ; we would like to repeat print a for 4 times
+;parse-> (each-exp (assign-exp a (num-exp 0))
+; (each-body-exp (bool-exp < (num-exp 5) (var-exp a)) (assign-exp a (math-exp + (var-exp a) (num-exp 1)))
+; (list-exp (output-exp (var-exp a)))))
 (define parsed (parser code))
 parsed
-(processor parsed var_env)
+;(processor parsed var_env)
 

@@ -110,7 +110,20 @@
        (cons
         'when-exp
         (map (lambda (item) (parser item)) (cdr statement)))
-       );this is our when expression (while)
+       );this is our when expression (while-loop)
+      ((and
+        (pair? statement)
+        (eq? 'each (car statement))
+        (eq? (length statement) 5))
+       (list 'each-exp
+             (list 'assign-exp (car (cadr statement)) (parser (cadr (cadr statement))))
+             (list 'each-body-exp
+                   (parser (caddr statement))
+                   (list 'assign-exp (car (cadddr statement)) (parser (cadr (cadddr statement))))
+                   (cons 'list-exp (map (lambda (item) (parser item)) (cadr (cdddr statement))))
+                   )
+             )
+       );this is our each expression (for-loop)
       ((and
         (pair? statement)
         (eq? 'block (car statement))

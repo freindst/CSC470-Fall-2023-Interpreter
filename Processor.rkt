@@ -166,6 +166,48 @@
     )
   )
 
+;parse-> (each-exp (assign-exp a (num-exp 0))
+; (each-body-exp (bool-exp < (num-exp 5) (var-exp a)) (assign-exp a (math-exp + (var-exp a) (num-exp 1)))
+; (list-exp (output-exp (var-exp a)))))
+(define process_each_exp
+  (lambda (body env)
+    (process_each_body_init (cadr body) (caddr body) env))
+    )
+  
+
+(define process_each_body_init
+  (lambda (assign body env)
+    (let
+    ((condition (process (cadr body)))
+     (new_env (process_assign_exp (assign)))
+         (true_exp (append (cadddr body) (list body)))
+         (false_exp (println "each-loop stops here.")))
+      (if condition
+          (process true_exp new_env)
+          (process false_exp new_env)
+          )
+      )
+    )
+  )
+    
+
+;(each-body-exp (bool-exp < (num-exp 5) (var-exp a))
+;(assign-exp a (math-exp + (var-exp a) (num-exp 1))) (list-exp (output-exp (var-exp a)))))
+(define process_each_body_exp
+  (lambda (body env)
+    (let
+        ((condition (process (cadr body)))
+         (new_env (process_assign_exp (caddr body) env))
+         (true_exp (append (cadddr body) (list body)))
+         (false_exp (println "each-loop stops here.")))
+      (if condition
+          (process true_exp env)
+          (process false_exp env)
+          )
+    )
+  )
+  )
+
 ;(#<void> (#<void> (#<void> (#<void> #<void>))))
 (define erase_void
   (lambda (lst)
@@ -277,6 +319,10 @@
       ;when parsed code is a when expression
       ((eq? 'when-exp (car parsedCode))
        (process_when_exp parsedCode env))
+      ((eq? 'each-exp (car parsedCode))
+       (print "todo"))
+      ((eq? 'each-body-exp (car parsedCode))
+       (print "todo"))
       ;when parsed code is an output expression
       ((eq? 'output-exp (car parsedCode))
        (displayln (string-append "***output***: "(number->string (processor (cadr parsedCode) env)))))
