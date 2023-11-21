@@ -86,6 +86,12 @@
     )
   )
 
+(define display-output
+  (lambda (output)
+    (displayln (string-append "***Display***: " output))
+    )
+  )
+
 (define pick_first_non_void_from_list
   (lambda (lst)
     (cond
