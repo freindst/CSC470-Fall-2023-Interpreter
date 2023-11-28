@@ -177,8 +177,8 @@
          (condition (process_bool_exp (cadr (caddr body)) new_env))
          (true_exp (append (cadddr (caddr body)) (list (caddr body)))))
       (if condition
-          (processor true_exp new_env)
-          (display-output "each loop ends here"))
+          (erase_void (processor true_exp new_env))
+          (display-output "each exp ends here"))
      )
     )
   )
@@ -189,17 +189,19 @@
 (define process_each_list_exp
   (lambda (body env)
     (cond
-      ((eq? (length body) 1) (display-output "each loop ends here")) ;to do it won't reach here yet
+      ((eq? (length body) 1) (display-output "each loop list exp ends here")) ;to do it won't reach here yet
       ((eq? (car (cadr body)) 'assign-exp)
        (processor (cons 'each-list-exp (cddr body)) (processor (cadr body) env)))
       ((void? (cadr body)) (list (cadr body)))
+      ((and
+        (eq? (car (cadr body)) 'each-body-exp)
+        (eq? (length body) 2))
+       (processor (cadr body) env))
       (else
-       
-       (append (processor (cadr body) env)
+       (cons (processor (cadr body) env)
              (processor
               (cons 'each-list-exp (cddr body))
               env)))
-       
       ;when the last time each-body-exp return #void; -> (process (each-list-exp #void)) -> #void)
      )
     )
