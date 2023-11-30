@@ -300,6 +300,54 @@
                 true);(true false false .....)
     )
   )
+
+(define process_block_exp
+  (lambda (body env)
+    (cond
+      ((eq? (length body) 1) '())
+      ((eq? 'assign-exp (car (cadr body)))
+       (process_block_exp
+        (cons 'block-exp (cddr body))
+        (process_assign_exp (cadr body) env))
+       )
+      ((eq? 'class-exp (car (cadr body)))
+       (process_block_exp
+        (cons 'block-exp (cddr body))
+        (process_class_exp (cadr body) env))
+       )
+      (else
+       (cons (processor (cadr body) env)
+             (process_block_exp
+              (cons 'block-exp (cddr body))
+              env)))
+     )
+    )
+  )
+
+(define process_class_exp
+  (lambda (body env)
+    (letrec
+     ((check_environment
+       (lambda (name the_env)
+         (cond
+           ((eq? (length the_env) 1) (eq? (car (car the_env)) (list 'class name)))
+           ((eq? (car (car the_env)) (list 'class name)) #t)
+           (else (check_environment name (cdr the_env)))
+           )
+         )
+       ))
+     (
+     ;1 check all the scope in the environment and compare the class name with the first item in the list,
+     ;if we find a duplicate class name, we will promp an error
+      if (check_environment (cadr body) env)
+          (error-output "Class name already exists.")
+     ;2 create a new scope to store the definition of the class
+          (cons (cons (list 'class (cadr body)) (cddr body)) env)
+      
+     )
+    )
+  )
+  )
                                
 
 (define processor
@@ -332,6 +380,8 @@
       ;when parsed code is an assignment expression
       ((eq? 'assign-exp (car parsedCode))
        (process_assign_exp parsedCode env))
+      ((eq? 'class-exp (car parsedCode))
+       (process_class_exp parsedCode env))
       ;when parsed code is a when expression
       ((eq? 'when-exp (car parsedCode))
        (process_when_exp parsedCode env))
@@ -346,8 +396,7 @@
        (displayln (string-append "***output***: "(number->string (processor (cadr parsedCode) env)))))
       ;when parsed code is a block expression
       ((eq? 'block-exp (car parsedCode))
-       (pick_first_non_void_from_list
-        (map (lambda (code) (processor code env)) (cdr parsedCode))))
+       (erase_void (process_block_exp parsedCode env)))
       ;....
       ;otherwise
       (else (error-output "Processor failed to produce result."))

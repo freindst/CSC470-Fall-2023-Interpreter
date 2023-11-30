@@ -130,6 +130,12 @@
         (> (length statement) 1))
        (cons 'block-exp
              (map (lambda(item)(parser item)) (cdr statement))));this is a block expression contains multiple statements in the list
+      ((and
+        (pair? statement)
+        (eq? 'class (car statement))
+        )
+       (cons 'class-exp (cdr statement))
+       )
       ((list? statement) ;(x 1 z ...) -> (list-exp (var-exp x) (num-exp 1) (var-exp z) ...)
        (cons 'list-exp (map (lambda(item)
               (parser item)
