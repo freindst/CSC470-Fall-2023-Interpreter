@@ -348,6 +348,63 @@
     )
   )
   )
+
+(define process_initiate_exp
+  (lambda (body env)
+    (letrec
+        (
+         (check_environment
+          (lambda (classname the_env)
+            (cond
+              ((null? the_env) #f)
+              ;(((class Person)...
+              ((eq? classname (car (car the_env))) #t)
+              (else (check_environment classname (cdr the_env)))
+             )))
+         (pull_constructor
+               (lambda (classname the_env)
+                 (cond
+                  ((eq? classname (car (car the_env)))
+                  (caddr (car the_env)))
+                 (else (pull_constructor classname (cdr the_env)))
+                 )))
+         (lookup_scope
+          (lambda (name scope)
+            (cond
+              ((eq? name (car (car scope))) (cadr (car scope)))
+              (else (lookup_scope name (cdr scope)))
+              )
+            )
+          )
+         (new_env
+          (if (eq? (car (car env)) (caddr body))
+              (cons '() env)
+              env))
+         )
+      (if (check_environment (caddr body) env)
+          (letrec (
+           (scope
+            (pair_helper
+             (cadr (pull_constructor (caddr body) env))
+             (map (lambda (parsed) (processor parsed env)) (cadddr body))
+            );variable names from the constructor argument list, value from the initate body
+           )
+           (constructor_body (caddr (pull_constructor (caddr body) env)))
+           )
+            (cons (cons
+             (list (cadr body)
+                  (cons (caddr body) (map (lambda (name_value_pair)(list (cadr (car name_value_pair)) (lookup_scope (cadr name_value_pair) scope) ) constructor_body)))
+            )
+             (car new_env))
+            (cdr new_env))
+            )
+          (error-output "Cannot find the class definition from the environment")
+
+     )
+    )
+  )
+  )
+
                                
 
 (define processor
@@ -382,6 +439,8 @@
        (process_assign_exp parsedCode env))
       ((eq? 'class-exp (car parsedCode))
        (process_class_exp parsedCode env))
+      ((eq? 'initiate-exp (car parsedCode))
+       (process_initiate_exp parsedCode env))
       ;when parsed code is a when expression
       ((eq? 'when-exp (car parsedCode))
        (process_when_exp parsedCode env))

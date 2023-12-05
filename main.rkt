@@ -13,13 +13,14 @@
 
 (define code '(block (class Person
    (fields (name))
-   (constructor (name) ((this name) name) )
+   (constructor (name) (((this name) name)) )
    (methods((tell () (out (this name)))))
-))) ; we would like to repeat print a for 4 times
-;parse-> (each-exp (assign-exp a (num-exp 0))
-; (each-body-exp (bool-exp < (num-exp 5) (var-exp a)) (assign-exp a (math-exp + (var-exp a) (num-exp 1)))
-; (each-list-exp (output-exp (var-exp a)))))
+)
+                     (initiate p Person ("Tim";(math + 1 2))
+                     ))))
+;1 done with store the definitions of a class with 'class keyword expression
+;2 create new instance of the class using the constructor
 (define parsed (parser code))
 parsed
-(processor parsed var_env)
+;(processor parsed var_env)
 

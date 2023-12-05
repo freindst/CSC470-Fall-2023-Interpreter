@@ -136,6 +136,16 @@
         )
        (cons 'class-exp (cdr statement))
        )
+      ((and
+        (pair? statement)
+        (eq? ' initiate (car statement))
+        )
+        (list
+         'initiate-exp
+         (cadr statement)
+         (list 'class (caddr statement))
+         (map (lambda (ele) (parser ele)) (cadddr statement)))
+       );(initiate p Person ("Tim"))
       ((list? statement) ;(x 1 z ...) -> (list-exp (var-exp x) (num-exp 1) (var-exp z) ...)
        (cons 'list-exp (map (lambda(item)
               (parser item)
